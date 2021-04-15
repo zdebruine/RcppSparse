@@ -5,6 +5,7 @@ This is a lightweight read-only `Rcpp::dgCMatrix` class which references a corre
 Compare to RcppEigen `SparseMatrix` and RcppArmadillo `SpMat` which are deep copies, not references to R objects.
 
 
+
 **WHAT IT IS**
 
 The dgCMatrix class is simply three vectors:
@@ -12,6 +13,7 @@ The dgCMatrix class is simply three vectors:
 -  `p`: column pointers for row pointers (`Rcpp::IntegerVector`)
 -  `x`: nonzeros (`Rcpp::NumericVector`)
 And a handy `const_iterator` class complete with methods for element access or subviews.
+
 
 
 **WHEN TO USE**
@@ -27,9 +29,11 @@ And a handy `const_iterator` class complete with methods for element access or s
 *Note that the cost of computing in "double" may be balanced out by the overhead of copying R doubles to C++ floats (and possibly back again to R doubles).
 
 
+
 **HOW TO USE**
 
 Include this header in your R package or in your C++ file.
+
 
 **DOCUMENTATION**
 
