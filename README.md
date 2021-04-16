@@ -5,11 +5,13 @@ _Rcpp::dgCMatrix_ is Rcpp class for compressed sparse column (CSC) matrices with
 * [Class structure](#class-structure)
 * [Rcpp::as and Rcpp::wrap](#Rcppas-and-Rcppwrap)
 * [Constructors](#constructors)
+* [Attributes](#attributes)
 * [Copy](#copy)
 * [Sparse iterators](#sparse-iterators)
 * [Element access](#element-access)
 * [Marginal totals](#marginal-totals)
 * [Coefficient-wise operations](#coefficient-wise-operations)
+* [Scalar functions](#scalar-functions)
 
 **Speed**: _Rcpp::dgCMatrix_ sparse iterators are faster than Armadillo, and only slightly slower than Eigen ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:-RcppArmadillo-and-RcppEigen)).  _Rcpp::dgCMatrix_ is almost universally faster than equivalent R "Matrix" package operations ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:--Matrix-R-package)).
 
@@ -97,6 +99,11 @@ r3  . .    0.35 .    .
 r4  . .    .    .    .   
 r5  . .    .    .    .   
 ```
+
+## Attributes
+* `.rows()`, `.nrow()`, `.n_rows` number of rows
+* `.cols()`, `.ncol()`, `.n_cols` number of columns
+* `.n_nonzero()` number of non-zero values
 
 ## .copy()
 Because Rcpp objects are references to R objects existing in memory, any manipulation of an `Rcpp::dgCMatrix` that has been passed to C++ via `Rcpp::as` will also affect the R object it points to. `.copy()` creates a deep copy of the object (as is done in `Rcpp::as` for RcppArmadillo and RcppEigen sparse matrix classes) so that operations on the returned object will no longer alter the original R object.
@@ -225,6 +232,8 @@ Rcpp::NumericVector Rcpp_rowSums(Rcpp::dgCMatrix& mat){
 ## Coefficient-wise operations
 `.abs()`, `.ceil()`, `.floor()`, `.round()`, `.sqrt()`, `.square()`, `.trunc()`
 
+## Scalar functions
+`.sum()`, `.mean()`
 
 ## .crossprod()
 Returns the cross-product of the matrix as _NumericMatrix_ (matrix of column-wise dot products). If OpenMP is defined, column-wise parallelization is employed.
