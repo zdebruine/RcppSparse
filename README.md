@@ -1,6 +1,6 @@
 # Rcpp::dgCMatrix
 
-`Rcpp::dgCMatrix` is Rcpp class for Compressed-Sparse-Column (CSC) matrices. It offers seamless zero-copy conversion by reference between R and C++. Usage is very similar to the Armadillo `SpMat` class, including row and column iterators.
+_Rcpp::dgCMatrix_ is Rcpp class for compressed sparse column (CSC) matrices with seamless zero-copy reference passing between R and C++. Usage is very similar to the Armadillo `SpMat` class, including row and column iterators.
 
 * [Class structure](#class-structure)
 * [Rcpp::as and Rcpp::wrap](#Rcppas-and-Rcppwrap)
