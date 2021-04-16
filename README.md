@@ -1,6 +1,6 @@
 # Rcpp::dgCMatrix
 
-`Rcpp::dgCMatrix` is native Rcpp namespace structure for Compressed-Sparse-Column (CSC) sparse matrices. It offers seamless zero-copy conversion by reference between R and C++ and back again. Sparse iterators for read-only or read/write access are available for access to all elements in the matrix or row/column of the matrix.
+`Rcpp::dgCMatrix` is Rcpp class for Compressed-Sparse-Column (CSC) matrices. It offers seamless zero-copy conversion by reference between R and C++. Usage is very similar to the Armadillo `SpMat` class, including row and column iterators.
 
 **Speed**: _Rcpp::dgCMatrix_ sparse iterators are faster than Armadillo, and only slightly slower than Eigen ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:-RcppArmadillo-and-RcppEigen)).  _Rcpp::dgCMatrix_ is almost universally faster than equivalent R "Matrix" package operations ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:--Matrix-R-package)).
 
