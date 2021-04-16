@@ -55,6 +55,14 @@ sum(mat) / sum1
 ## Constructors
 In addition to passing a dgCMatrix from R to C++ via Rcpp, _Rcpp::dgCMatrix_ may be constructed in C++. You must specify `i`, `p`, and `x`, and the number of rows, values which correspond to the respective slots in an R `Matrix::dgCMatrix`.
 
+* `dgCMatrix(i, p, x, nrow)` as _(IntegerVector, IntegerVector, NumericVector, int)_
+* `dgCMatrix(i, p, x, nrow, ncol)` as _(IntegerVector, IntegerVector, NumericVector, int, int)_
+* `dgCMatrix(i, p, x, nrow, Dimnames)` as _(IntegerVector, IntegerVector, NumericVector, int, List)_
+* `dgCMatrix(i, p, x, nrow, ncol, Dimnames)` as _(IntegerVector, IntegerVector, NumericVector, int, int, List)_
+* `dgCMatrix(S4)` containing slot attributes for _i_, _p_, _x_, _Dim_, and _Dimnames_ as _(IntegerVector, IntegerVector, NumericVector, IntegerVector, List)_
+
+**Note**: Dimnames must be an _Rcpp::List_ of two _Rcpp::CharacterVector_
+
 **C++**
 ```{Cpp}
 //[[Rcpp::export]]
