@@ -4,8 +4,6 @@
 // This header file extends the Rcpp namespace with a dgCMatrix sparse matrix class
 // This class is documented at github.com/zdebruine/RcppSparse
 
-#include <rcpp.h>
-
 namespace Rcpp {
     class dgCMatrix {
     public:
