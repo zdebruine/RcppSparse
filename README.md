@@ -4,6 +4,12 @@
 
 * [Class structure](#class-structure)
 * [Rcpp::as and Rcpp::wrap](#Rcppas-and-Rcppwrap)
+* [Constructors](#constructors)
+* [Copy](#copy)
+* [Sparse iterators](#sparse-iterators)
+* [Element access](#element-access)
+* [Marginal totals](#marginal-totals)
+* [Coefficient-wise operations](#coefficient-wise-operations)
 
 **Speed**: _Rcpp::dgCMatrix_ sparse iterators are faster than Armadillo, and only slightly slower than Eigen ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:-RcppArmadillo-and-RcppEigen)).  _Rcpp::dgCMatrix_ is almost universally faster than equivalent R "Matrix" package operations ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:--Matrix-R-package)).
 
