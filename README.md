@@ -14,7 +14,7 @@
 **Speed**: _Rcpp::dgCMatrix_ sparse iterators are faster than Armadillo, and only slightly slower than Eigen ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:-RcppArmadillo-and-RcppEigen)).  _Rcpp::dgCMatrix_ is almost universally faster than equivalent R "Matrix" package operations ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:--Matrix-R-package)).
 
 ## When to use/not to use
-* Use when you need to access an R dgCMatrix in C++ and do not need to modify non-zero values
+* Use when you need to access an R dgCMatrix in C++ in _double_ type and do not need to modify non-zero values
 * Use when the overhead of a deep copy of your sparse matrix is unacceptable or a copy of your very large matrix will not fit in memory
 * Do not use when you need to modify zero-valued indices or perform linear algebra operations on the matrix itself
 * Do not use when you need a type other than _double_ (i.e. _float_), but note that the cost of computing in _double_ rather than _float_ may be balanced out by the overhead of copying the R _double_ type to _float_ (and possibly back again to R _double_).
