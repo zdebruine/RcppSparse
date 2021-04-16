@@ -7,8 +7,10 @@
 ## When to use/not to use
 * Use when the overhead of a deep copy of your sparse matrix is unacceptable
 * Use when a copy of your very large matrix will not fit in memory
-* Do not use when you need to modify zero-valued indices or perform linear algebra operations
+* Do not use when you need to modify zero-valued indices or perform linear algebra operations on the matrix itself
 * Do not use when you need a type other than _double_ (i.e. _float_), but note that the cost of computing in _double_ rather than _float_ may be balanced out by the overhead of copying the R _double_ type to _float_ (and possibly back again to R _double_).
+
+**Note:** An _Rcpp::dgCMatrix_ is simply a container holding references to _double_ values, so _Rcpp::dgCMatrix_ sparse iterators may be used to modify any STL, Armadillo, Eigen, etc. object.
 
 ## How to use
 Include `<RcppSparse.h>` in place of `<Rcpp.h>` in your .cpp file, or simply copy the contents of `<RcppSparse.h>` into your .cpp file.
@@ -19,7 +21,7 @@ The _Rcpp::dgCMatrix_ exactly corresponds to the dgCMatrix S4 class structure in
 * `p`: column pointers for row pointers (_Rcpp::IntegerVector_)
 * `x`: nonzeros (_Rcpp::NumericVector_)
 
-These vectors are public, but do not manipulate them directly unless you know what you are doing, as you may invalidate the S4 object.
+**Note:** These vectors are public, but do not manipulate them directly unless you know what you are doing, as you may invalidate the S4 object.
 
 ## Rcpp::as and Rcpp::wrap
 `Rcpp::as` and `Rcpp::wrap` methods for `Rcpp::dgCMatrix` ensure seamless conversion of any _dgCMatrix_ passed to/from R to Rcpp.
@@ -116,7 +118,7 @@ Forward iterators traverse over non-zero elements within the specified range wit
 * `!=`, `<` logical comparison of two iterators of the same class
 * `++` post-increment
 
-### Notes:
+**Note**:
 * Setting values to zero will not alter indexing. The matrix pointers are not adjusted.
 * Indices with zero values cannot be accessed as in RcppArmadillo or RcppEigen sparse matrix classes.
 * Generally avoid row iterators if possible, although this implementation is not inferior to RcppArmadillo or RcppEigen.
