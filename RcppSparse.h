@@ -35,40 +35,177 @@ namespace Rcpp {
             Dimnames = mat.slot("Dimnames");
         };
 
-        // basic properties
+        // copy
+        dgCMatrix copy() {
+            Rcpp::IntegerVector i_copied(i.size());
+            Rcpp::IntegerVector p_copied(p.size());
+            Rcpp::NumericVector x_copied(x.size());
+            std::copy(i.begin(), i.end(), i_copied.begin());
+            std::copy(p.begin(), p.end(), p_copied.begin());
+            std::copy(x.begin(), x.end(), x_copied.begin());
+            return dgCMatrix(i_copied, p_copied, x_copied, Dim[0]);
+        }
+
+        // properties
         int nrow() { return Dim[0]; };
         int ncol() { return Dim[1]; };
         int rows() { return Dim[0]; };
         int cols() { return Dim[1]; };
         int n_nonzero() { return x.size(); };
         NumericVector& nonzeros() { return x; };
-        double sum() { return Rcpp::sum(x); };
+        IntegerVector innerIndexPtr() { return i; };
+        IntegerVector outerIndexPtr() { return p; };
 
-        // forward constant iterator
+        // scalar functions
+        double sum() { return Rcpp::sum(x); };
+        double mean() { return Rcpp::mean(x); };
+
+        // iterators
+        class iterator {
+        public:
+            int index;
+            iterator(dgCMatrix& g, int ind) : parent(g) { index = ind; }
+            bool operator!=(iterator x) { return index != x.index; };
+            bool operator<(iterator x) { return index < x.index; };
+            iterator& operator++(int) { ++index; return (*this); };
+            int row() { return parent.i[index]; };
+            int col() { int j = 0; for (; j < parent.p.size(); ++j) if (parent.p[j] > index) break; return j; };
+            double& operator*() { return parent.x[index]; };
+            double& value() { return parent.x[index]; };
+        private:
+            dgCMatrix& parent;
+        };
+        iterator begin() { return iterator(*this, (int)0); };
+        iterator end() { return iterator(*this, i.size()); };
+
         class const_iterator {
         public:
             int index;
             const_iterator(dgCMatrix& g, int ind) : parent(g) { index = ind; }
             bool operator!=(const_iterator x) const { return index != x.index; };
-            bool operator==(const_iterator x) const { return index == x.index; };
             bool operator<(const_iterator x) const { return index < x.index; };
-            bool operator>(const_iterator x) const { return index > x.index; };
             const_iterator& operator++(int) { ++index; return (*this); };
-            const_iterator& operator--(int) { --index; return (*this); };
             int row() { return parent.i[index]; };
-            int col() { int j = 0; for (; j < parent.p.size(); ++j) if (parent.p[j] >= index) break; return j; };
-            double& operator*() { return parent.x[index]; };
+            int col() { int j = 0; for (; j < parent.p.size(); ++j) if (parent.p[j] > index) break; return j; };
+            double operator*() const { return parent.x[index]; };
+            double value() const { return parent.x[index]; };
         private:
             dgCMatrix& parent;
         };
+        const_iterator const_begin() { return const_iterator(*this, (int)0); };
+        const_iterator const_end() { return const_iterator(*this, i.size()); };
 
-        // iterator constructors
-        const_iterator begin(int j) { return const_iterator(*this, (int)0); };
-        const_iterator end(int j) { return const_iterator(*this, i.size() - 1); };
-        const_iterator begin_col(int j) { return const_iterator(*this, p[j]); };
-        const_iterator end_col(int j) { return const_iterator(*this, p[j + 1]); };
+        class col_iterator {
+        public:
+            int index;
+            col_iterator(dgCMatrix& g, int ind) : parent(g) { index = ind; }
+            bool operator!=(col_iterator x) { return index != x.index; };
+            bool operator<(col_iterator x) { return index < x.index; };
+            col_iterator& operator++(int) { ++index; return (*this); };
+            int row() { return parent.i[index]; };
+            int col() { return column; };
+            double& operator*() { return parent.x[index]; };
+            double& value() { return parent.x[index]; };
+        private:
+            dgCMatrix& parent;
+            int column;
+        };
+        col_iterator begin_col(int j) { return col_iterator(*this, p[j]); };
+        col_iterator end_col(int j) { return col_iterator(*this, p[j + 1]); };
 
-        // read-only element access
+        class const_col_iterator {
+        public:
+            int index;
+            const_col_iterator(dgCMatrix& g, int ind) : parent(g) { index = ind; }
+            bool operator!=(const_col_iterator x) const { return index != x.index; };
+            bool operator<(const_col_iterator x) const { return index < x.index; };
+            const_col_iterator& operator++(int) { ++index; return (*this); };
+            int row() { return parent.i[index]; };
+            int col() { return column; };
+            double operator*() const { return parent.x[index]; };
+            double value() const { return parent.x[index]; };
+        private:
+            dgCMatrix& parent;
+            int column;
+        };
+        const_col_iterator const_begin_col(int j) { return const_col_iterator(*this, p[j]); };
+        const_col_iterator const_end_col(int j) { return const_col_iterator(*this, p[j + 1]); };
+
+        class row_iterator {
+        public:
+            int index;
+            row_iterator(dgCMatrix& g, int ind) : parent(g) { index = ind; }
+            bool operator!=(row_iterator x) { return index != x.index; };
+            bool operator<(row_iterator x) { return index < x.index; };
+            row_iterator& operator++(int) {
+                if (index + 1 == end_index) ++index;
+                else for (int r = parent.i[index + 1]; r < end_index; ++r)
+                    if (parent.i[r] == roww) { index = r; break; }
+                return (*this);
+            };
+            int row() { return roww; };
+            int col() { int j = 0; for (; j < parent.p.size(); ++j) if (parent.p[j] > index) break; return j; };
+            double& operator*() { return parent.x[index]; };
+            double& value() { return parent.x[index]; };
+        private:
+            dgCMatrix& parent;
+            int roww, end_index;
+        };
+        row_iterator begin_row(int j) {
+            int row_index = 0;
+            for (int r = 0; r < Dim[1]; ++r)
+                if (i[r] == j) { row_index = r; break; }
+            return row_iterator(*this, row_index);
+        };
+        row_iterator end_row(int j) {
+            int row_index = 0;
+            for (int r = 0; r < Dim[1]; ++r)
+                if (i[r] == j) row_index = r;
+            return row_iterator(*this, row_index + 1);
+        };
+
+        class const_row_iterator {
+        public:
+            int index;
+            const_row_iterator(dgCMatrix& g, int ind) : parent(g) { index = ind; }
+            bool operator!=(const_row_iterator x) const { return index != x.index; };
+            bool operator<(const_row_iterator x) const { return index < x.index; };
+            const_row_iterator& operator++(int) {
+                if (index + 1 == end_index) ++index;
+                else for (int r = parent.i[index + 1]; r < end_index; ++r)
+                    if (parent.i[r] == roww) { index = r; break; }
+                return (*this);
+            };
+            int row() { return roww; };
+            int col() { int j = 0; for (; j < parent.p.size(); ++j) if (parent.p[j] > index) break; return j; };
+            double operator*() const { return parent.x[index]; };
+            double value() const { return parent.x[index]; };
+        private:
+            dgCMatrix& parent;
+            int roww, end_index;
+        };
+        const_row_iterator const_begin_row(int j) {
+            int row_index = 0;
+            for (int r = 0; r < Dim[1]; ++r)
+                if (i[r] == j) { row_index = r; break; }
+            return const_row_iterator(*this, row_index);
+        };
+        const_row_iterator const_end_row(int j) {
+            int row_index = 0;
+            for (int r = 0; r < Dim[1]; ++r)
+                if (i[r] == j) row_index = r;
+            return const_row_iterator(*this, row_index + 1);
+        };
+        // element-wise operations
+        void abs() { for (int j = 0; j < x.size(); ++j) x[j] = std::abs(x[j]); };
+        void ceil() { for (int j = 0; j < x.size(); ++j) x[j] = std::ceil(x[j]); };
+        void floor() { for (int j = 0; j < x.size(); ++j) x[j] = std::floor(x[j]); };
+        void round() { for (int j = 0; j < x.size(); ++j) x[j] = std::round(x[j]); };
+        void sqrt() { for (int j = 0; j < x.size(); ++j) x[j] = std::sqrt(x[j]); };
+        void square() { for (int j = 0; j < x.size(); ++j) x[j] = x[j] * x[j]; };
+        void trunc() { for (int j = 0; j < x.size(); ++j) x[j] = std::trunc(x[j]); };
+
+        // subviews
         double at(int row, int col) const {
             for (int j = p[col]; j < p[col + 1]; ++j) {
                 if (i[j] == row) return x[j];
