@@ -28,13 +28,14 @@ namespace Rcpp {
             i = A_i; p = A_p; x = A_x; Dim = IntegerVector::create(nrow, ncol); Dimnames = A_Dimnames; n_cols = ncol; n_rows = nrow;
         };
         dgCMatrix(S4 mat) {
+            IntegerVector dims = mat.slot("Dim");
             i = mat.slot("i");
             p = mat.slot("p");
             x = mat.slot("x");
-            Dim = mat.slot("Dim");
+            Dim = dims;
+            n_cols = dims[1];
+            n_rows = dims[0];
             Dimnames = mat.slot("Dimnames");
-            n_cols = mat.slot("Dim")[1];
-            n_rows = mat.slot("Dim")[0];
         };
 
         // copy
