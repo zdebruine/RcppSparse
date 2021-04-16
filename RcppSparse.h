@@ -12,20 +12,20 @@ namespace Rcpp {
         IntegerVector i, p, Dim;
         NumericVector x;
         List Dimnames;
+        int n_cols, n_rows;
 
         // constructors
         dgCMatrix(IntegerVector& A_i, IntegerVector& A_p, NumericVector& A_x, int nrow) {
-            i = A_i;
-            p = A_p;
-            x = A_x;
-            Dim = IntegerVector::create(nrow, A_p.size() - 1);
+            i = A_i; p = A_p; x = A_x; Dim = IntegerVector::create(nrow, A_p.size() - 1); n_cols = A_p.size() - 1; n_rows = nrow;
+        };
+        dgCMatrix(IntegerVector& A_i, IntegerVector& A_p, NumericVector& A_x, int nrow, int ncol) {
+            i = A_i; p = A_p; x = A_x; Dim = IntegerVector::create(nrow, ncol); n_cols = ncol; n_rows = nrow;
         };
         dgCMatrix(IntegerVector& A_i, IntegerVector& A_p, NumericVector& A_x, int nrow, List& A_Dimnames) {
-            i = A_i;
-            p = A_p;
-            x = A_x;
-            Dim = IntegerVector::create(nrow, A_p.size() - 1);
-            Dimnames = A_Dimnames;
+            i = A_i; p = A_p; x = A_x; Dim = IntegerVector::create(nrow, A_p.size() - 1); Dimnames = A_Dimnames; n_cols = A_p.size() - 1; n_rows = nrow;
+        };
+        dgCMatrix(IntegerVector& A_i, IntegerVector& A_p, NumericVector& A_x, int nrow, int ncol, List& A_Dimnames) {
+            i = A_i; p = A_p; x = A_x; Dim = IntegerVector::create(nrow, ncol); Dimnames = A_Dimnames; n_cols = ncol; n_rows = nrow;
         };
         dgCMatrix(S4 mat) {
             i = mat.slot("i");
@@ -33,6 +33,8 @@ namespace Rcpp {
             x = mat.slot("x");
             Dim = mat.slot("Dim");
             Dimnames = mat.slot("Dimnames");
+            n_cols = mat.slot("Dim")[1];
+            n_rows = mat.slot("Dim")[0];
         };
 
         // copy
@@ -43,14 +45,14 @@ namespace Rcpp {
             std::copy(i.begin(), i.end(), i_copied.begin());
             std::copy(p.begin(), p.end(), p_copied.begin());
             std::copy(x.begin(), x.end(), x_copied.begin());
-            return dgCMatrix(i_copied, p_copied, x_copied, Dim[0]);
+            return dgCMatrix(i_copied, p_copied, x_copied, n_rows, n_cols);
         }
 
         // properties
-        int nrow() { return Dim[0]; };
-        int ncol() { return Dim[1]; };
-        int rows() { return Dim[0]; };
-        int cols() { return Dim[1]; };
+        int nrow() { return n_rows; };
+        int ncol() { return n_cols; };
+        int rows() { return n_rows; };
+        int cols() { return n_cols; };
         int n_nonzero() { return x.size(); };
         NumericVector& nonzeros() { return x; };
         IntegerVector innerIndexPtr() { return i; };
