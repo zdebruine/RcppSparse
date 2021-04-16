@@ -184,7 +184,7 @@ void multiply_by_vec(Rcpp::dgCMatrix& mat, Rcpp::NumericVector& vec){
 The above returns value copies of non-contiguous subviews copied to a _double_, _NumericVector_, or _NumericMatrix_, including zeros.
 
 ### Dense Marginal Views
-`.col()`, `.row()`, `.cols()`, `.rows()`
+`.col(int)`, `.row(int)`, `.cols(IntegerVector)`, `.rows(IntegerVector)`
 Returns a _NumericVector_ or _NumericMatrix_ corresponding to the marginal values, including zeros.
 
 If you need write access to non-zero values in subviews, use sparse iterators. If this does not meet your needs, consider RcppArmadillo and RcppEigen.
