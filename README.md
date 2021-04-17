@@ -13,7 +13,7 @@ _Rcpp::dgCMatrix_ is Rcpp class for compressed sparse column (CSC) matrices with
 * [Coefficient-wise operations](#coefficient-wise-operations)
 * [Scalar functions](#scalar-functions)
 
-**Speed**: _Rcpp::dgCMatrix_ sparse iterators are faster than Armadillo, and only slightly slower than Eigen ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:-RcppArmadillo-and-RcppEigen)).  _Rcpp::dgCMatrix_ is almost universally faster than equivalent R "Matrix" package operations ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:--Matrix-R-package)).
+**Speed**: _Rcpp::dgCMatrix_ sparse iterators are at least as fast as Armadillo, and only slightly slower than Eigen ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:-RcppArmadillo-and-RcppEigen)).  _Rcpp::dgCMatrix_ is almost universally faster than equivalent R "Matrix" package operations ([**benchmarks**](https://github.com/zdebruine/RcppSparse/wiki/Microbenchmarks:--Matrix-R-package)).
 
 ## Why to use
 RcppArmadillo and RcppEigen make deep copies of a sparse matrix when converting from R double-type to C++ type. _Rcpp::dgcMatrix_ passes by reference, not copy. This means no time or memory is wasted doing a deep copy.
