@@ -24,8 +24,6 @@ RcppArmadillo and RcppEigen make deep copies of a sparse matrix when converting 
 * Do not use when you need to modify zero-valued indices or perform linear algebra operations on the matrix itself
 * Do not use when you need a type other than _double_ (i.e. _float_), but note that the cost of computing in _double_ rather than _float_ may be balanced out by the overhead of copying the R _double_ type to _float_ (and possibly back again to R _double_).
 
-**Note:** An _Rcpp::dgCMatrix_ is simply a container holding references to _double_ values, so _Rcpp::dgCMatrix_ sparse iterators may be used to modify any STL, Armadillo, Eigen, etc. object.
-
 ## How to use
 Include `<RcppSparse.h>` in place of `<Rcpp.h>` in your .cpp file, or simply copy the contents of `<RcppSparse.h>` into your .cpp file.
 
