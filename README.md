@@ -1,14 +1,13 @@
 # RcppSparse
 
+Quick links:
+- (Documentation)[https://zdebruine.github.io/RcppSparse/articles/Documentation.html]
+- (Example)[https://github.com/zdebruine/RcppSparse/blob/main/src/example.cpp]
+- Install: `install.packages("RcppSparse")
+
 RcppSparse provides a seamless Rcpp object class for R sparse matrix objects. The `RcppSparse::Matrix` class can directly import `Matrix::dgCMatrix-class` objects from R without any copying by simply using base Rcpp types (`IntegerVector` and `NumericVector`).
 
 The result is a constant, by-reference, zero-copy Rcpp sparse matrix class. In contrast, RcppArmadillo and RcppEigen are deep copies.
-
-## Documentation
-
-Full documentation is available in the package site at `zdebruine.github.io/RcppSparse/docs/articles/Documentation.html`.
-
-## Getting Started
 
 Install RcppSparse from CRAN with `install.packages("RcppSparse")` and then load the header library in your C++ file:
 
@@ -39,4 +38,4 @@ class(A) # this is a "dgCMatrix"
 columnSums(A)
 ```
 
-The idea of a zero-copy sparse matrix class is discussed on the Rcpp gallery: https://gallery.rcpp.org/articles/sparse-matrix-class/.
+The idea of a zero-copy sparse matrix class is discussed on the (Rcpp gallery)[https://gallery.rcpp.org/articles/sparse-matrix-class/].
