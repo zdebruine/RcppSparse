@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppSparse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0</span>
       </span>
     </div>
 
@@ -276,7 +276,7 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/rsparsematrix.html">rsparsematrix</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">0.5</span><span class="op">)</span>
 <span class="fu">column_sums</span><span class="op">(</span><span class="va">A</span><span class="op">)</span>
-<span class="co">#&gt; [1]  0.610  0.790 -1.333  2.850 -2.485</span></code></pre></div>
+<span class="co">#&gt; [1] -1.990  0.373 -0.530  0.498  0.330</span></code></pre></div>
 <p>Usage of the row iterator is similar, but should not be used unless absolutely necessary as row-wise lookup in a column-major storage format is much less efficient than column-wise lookup.</p>
 <p>The <code>InnerIteratorInRange</code> iterator receives a <code>std::vector&lt;unsigned int&gt;</code> giving row indices in a range over which to iterate. This is similar to the Boost ForwardTraversalIterator concept. This iterator can be useful for comparing two sparse matrices, and can be more efficient than simply pairing two iterators. <code>InnerIteratorNotInRange</code> usage is similar, but looks up values not in the specified range.</p>
 </div>
@@ -302,7 +302,7 @@
 <span class="va">A2</span><span class="op">@</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
 <span class="co">#&gt; [1] 999</span>
 <span class="va">A</span><span class="op">@</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
-<span class="co">#&gt; [1] -0.93</span>
+<span class="co">#&gt; [1] -1.5</span>
 <span class="fu">change_value2</span><span class="op">(</span><span class="va">A</span><span class="op">)</span>
 <span class="va">A</span><span class="op">@</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
 <span class="co">#&gt; [1] 999</span></code></pre></div>

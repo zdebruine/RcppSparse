@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppSparse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0</span>
       </span>
     </div>
 
@@ -132,7 +132,7 @@
 that is to objects of class <code>dgCMatrix</code> as <code>Rcpp::NumericMatrix</code> is to objects of class <code>"matrix"</code>.</p>
 <p>The class is equipped with iterators that allow for efficient marginal traversal of values in columns, rows, or ranges of a column.
 Performance of the iterators exceeds that of <code>RcppArmadillo::SpMat</code> and approaches that of <code>Eigen::SparseMatrix</code>.</p>
-<p>The class iterators and member functions in <code><a href='https://rdrr.io/pkg/Matrix/man/Matrix.html'>RcppSparse::Matrix</a></code> align with method counterparts in the <code>Eigen::SparseMatrix&lt;double&gt;</code>, such
+<p>The class iterators and member functions in <code>RcppSparse::Matrix</code> align with method counterparts in the <code>Eigen::SparseMatrix&lt;double&gt;</code>, such
 that templated functions accepting either class can be used without further specialization.</p>
 <p>Note: This class is read-only. While access to the <code>i</code>, <code>p</code>, <code>Dim</code>, and <code>x</code> vectors is public, there are no methods
 for inserting or erasing values.</p>

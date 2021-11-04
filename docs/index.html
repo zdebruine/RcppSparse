@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">RcppSparse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0</span>
       </span>
     </div>
 
@@ -74,16 +74,14 @@
 <div id="rcppsparse" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#rcppsparse" class="anchor"></a>RcppSparse</h1></div>
-<p>RcppSparse provides a seamless Rcpp object class for R sparse matrix objects. The <code><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html">RcppSparse::Matrix</a></code> class can directly import <code>Matrix::dgCMatrix-class</code> objects from R without any copying by simply using base Rcpp types (<code>IntegerVector</code> and <code>NumericVector</code>).</p>
+<ul>
+<li><a href="https://zdebruine.github.io/RcppSparse/articles/Documentation.html">Documentation</a></li>
+<li><a href="https://github.com/zdebruine/RcppSparse/blob/main/src/example.cpp">Example</a></li>
+<li>Install: <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("RcppSparse")</a></code>
+</li>
+</ul>
+<p>RcppSparse provides a seamless Rcpp object class for R sparse matrix objects. The <code>RcppSparse::Matrix</code> class can directly import <code>Matrix::dgCMatrix-class</code> objects from R without any copying by simply using base Rcpp types (<code>IntegerVector</code> and <code>NumericVector</code>).</p>
 <p>The result is a constant, by-reference, zero-copy Rcpp sparse matrix class. In contrast, RcppArmadillo and RcppEigen are deep copies.</p>
-<div id="documentation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#documentation" class="anchor"></a>Documentation</h2>
-<p>Full documentation is available in the package site at <code>zdebruine.github.io/RcppSparse/docs/articles/Documentation.html</code>.</p>
-</div>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting Started</h2>
 <p>Install RcppSparse from CRAN with <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("RcppSparse")</a></code> and then load the header library in your C++ file:</p>
 <pre class="{rcpp}"><code>//[[Rcpp::depends(RcppSparse)]]
 #include RcppSparse.h // this line before ever including Rcpp.h</code></pre>
@@ -101,8 +99,7 @@ Rcpp::NumericVector columnSums(RcppSparse::Matrix&amp; A) {
 A &lt;- rsparsematrix(nrow = 10, ncol = 10, density = 0.1)
 class(A) # this is a "dgCMatrix"
 columnSums(A)</a></code></pre>
-<p>The idea of a zero-copy sparse matrix class is discussed on the Rcpp gallery: <a href="https://gallery.rcpp.org/articles/sparse-matrix-class/" class="uri">https://gallery.rcpp.org/articles/sparse-matrix-class/</a>.</p>
-</div>
+<p>The idea of a zero-copy sparse matrix class is discussed on the <a href="https://gallery.rcpp.org/articles/sparse-matrix-class/">Rcpp gallery</a>.</p>
 </div>
   </div>
 
