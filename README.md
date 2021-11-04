@@ -1,6 +1,5 @@
 # RcppSparse
 
-Quick links:
 - [Documentation](https://zdebruine.github.io/RcppSparse/articles/Documentation.html)
 - [Example](https://github.com/zdebruine/RcppSparse/blob/main/src/example.cpp)
 - Install: `install.packages("RcppSparse")
@@ -38,4 +37,4 @@ class(A) # this is a "dgCMatrix"
 columnSums(A)
 ```
 
-The idea of a zero-copy sparse matrix class is discussed on the (Rcpp gallery)[https://gallery.rcpp.org/articles/sparse-matrix-class/].
+The idea of a zero-copy sparse matrix class is discussed on the [Rcpp gallery](https://gallery.rcpp.org/articles/sparse-matrix-class/).
