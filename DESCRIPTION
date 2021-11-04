@@ -1,0 +1,21 @@
+Package: RcppSparse
+Type: Package
+Title: An 'Rcpp' sparse matrix class header
+Version: 1.0
+Date: 2021-11-04
+Author: Zach DeBruine
+Maintainer: Zach DeBruine <zacharydebruine@gmail.com>
+Description: A lightweight 'Rcpp' sparse 'dgCMatrix' matrix class for seamless access to R objects in memory.
+License: GPL (>= 2)
+Imports: Rcpp (>= 1.0.7), Matrix
+LinkingTo: Rcpp
+RoxygenNote: 7.1.2
+Suggests: 
+    rmarkdown,
+    knitr,
+    RcppArmadillo,
+    RcppEigen,
+    RcppClock,
+    ggplot2,
+    microbenchmark
+VignetteBuilder: knitr

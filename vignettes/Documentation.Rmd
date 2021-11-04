@@ -1,0 +1,431 @@
+---
+title: "Documentation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Documentation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{Rcpp, ref.label=knitr::all_rcpp_labels(), include=FALSE}
+```
+
+```{Rcpp, eval = FALSE, message = FALSE, warning = FALSE, results = "hide", echo = FALSE}
+//[[Rcpp::depends(RcppArmadillo)]]
+#include <RcppArmadillo.h>
+
+#include <RcppCommon.h>
+
+namespace RcppSparse {
+    class Matrix;
+}
+
+namespace Rcpp {
+
+    namespace traits {
+
+        template <>
+        class Exporter<RcppSparse::Matrix>;
+    }
+}
+
+#include <Rcpp.h>
+
+namespace RcppSparse {
+    class Matrix {
+        public:
+
+        // public member objects
+        Rcpp::NumericVector x;
+        Rcpp::IntegerVector i, p, Dim;
+
+        // constructors
+        Matrix(Rcpp::NumericVector x, Rcpp::IntegerVector i, Rcpp::IntegerVector p, Rcpp::IntegerVector Dim) : x(x), i(i), p(p), Dim(Dim) {}
+        Matrix(const Rcpp::S4& s) {
+            if (!s.hasSlot("x") || !s.hasSlot("p") || !s.hasSlot("i") || !s.hasSlot("Dim"))
+                throw std::invalid_argument("Cannot construct RcppSparse::Matrix from this S4 object");
+            x = s.slot("x");
+            i = s.slot("i");
+            p = s.slot("p");
+            Dim = s.slot("Dim");
+        }
+        Matrix() {}
+
+        unsigned int rows() { return Dim[0]; }
+        unsigned int cols() { return Dim[1]; }
+        unsigned int nrow() { return Dim[0]; }
+        unsigned int ncol() { return Dim[1]; }
+        unsigned int n_nonzero() { return x.size(); };
+        Rcpp::NumericVector& nonzeros() { return x; };
+        Rcpp::IntegerVector& innerIndexPtr() { return i; };
+        Rcpp::IntegerVector& outerIndexPtr() { return p; };
+
+        // create a deep copy of an R object
+        Matrix clone() {
+            Rcpp::NumericVector x_ = Rcpp::clone(x);
+            Rcpp::IntegerVector i_ = Rcpp::clone(i);
+            Rcpp::IntegerVector p_ = Rcpp::clone(p);
+            Rcpp::IntegerVector Dim_ = Rcpp::clone(Dim);
+            return Matrix(x_, i_, p_, Dim_);
+        }
+
+        // const column iterator
+        class InnerIterator {
+            public:
+            InnerIterator(Matrix& ptr, int col) :
+                ptr(ptr), col_(col), index(ptr.p[col]), max_index(ptr.p[col + 1]) {}
+            operator bool() const { return (index < max_index); }
+            InnerIterator& operator++() { ++index; return *this; }
+            const double& value() const { return ptr.x[index]; }
+            int row() const { return ptr.i[index]; }
+            int col() const { return col_; }
+
+            private:
+            Matrix& ptr;
+            int col_, index, max_index;
+        };
+
+        Rcpp::S4 wrap() {
+            Rcpp::S4 s(std::string("dgCMatrix"));
+            s.slot("x") = x;
+            s.slot("i") = i;
+            s.slot("p") = p;
+            s.slot("Dim") = Dim;
+            return s;
+        }
+    };
+}
+
+namespace Rcpp {
+
+    namespace traits {
+
+        template <>
+        class Exporter<RcppSparse::Matrix> {
+            Rcpp::NumericVector x_;
+            Rcpp::IntegerVector i, p, Dim;
+
+            public:
+            Exporter(SEXP x) {
+                Rcpp::S4 s(x);
+                if (!s.hasSlot("x") || !s.hasSlot("p") || !s.hasSlot("i") || !s.hasSlot("Dim"))
+                    throw std::invalid_argument("Cannot construct RcppSparse::Matrix from this S4 object");
+                x_ = s.slot("x");
+                i = s.slot("i");
+                p = s.slot("p");
+                Dim = s.slot("Dim");
+            }
+
+            RcppSparse::Matrix get() {
+                return RcppSparse::Matrix(x_, i, p, Dim);
+            }
+        };
+    }
+}
+
+//[[Rcpp::depends(RcppEigen)]]
+//[[Rcpp::depends(RcppClock)]]
+#include <RcppEigen.h>
+#include <RcppClock.h>
+```
+
+```{R, echo = FALSE, message = FALSE, warning = FALSE}
+library(RcppClock)
+library(RcppEigen)
+library(RcppArmadillo)
+library(ggplot2)
+library(microbenchmark)
+library(Matrix)
+```
+
+## Why `RcppSparse::Matrix`?
+
+Accessing R sparse matrix objects in C++ via RcppArmadillo and RcppEigen requires _deep copies_ because R SEXP types must be converted to C++ types. However, the Rcpp package provides base objects (`Rcpp::NumericVector` and `Rcpp::IntegerVector`) that are convenient containers around R objects existing in memory. `RcppSparse::Matrix` simply wraps these containers to provide a zero-copy by-reference class for reading R sparse matrix objects in C++.
+
+Unlike RcppArmadillo and RcppEigen, RcppSparse wastes no time or memory in the R to C++ to R conversion process.
+
+**When to use:** When only read access is needed and additional functionality in RcppArmadillo or RcppEigen is not needed.
+
+**When not to use:** When memory or R -> C++ -> R conversion is not limiting or write access is needed.
+
+## Installation
+
+Install `RcppSparse` from CRAN:
+
+```{R, eval = FALSE}
+install.packages("RcppSparse")
+```
+
+Include the header in your C++ file using `#include <RcppSparse.h>`. It is then unnecessary to include `Rcpp.h`, and `Rcpp.h` may not be included prior to including `RcppSparse.h`.
+
+## Sparse Matrix Class
+
+The `Matrix` class contains public members corresponding exactly to the `Matrix::dgCMatrix-class`:
+
+* `x`: An `Rcpp::NumericVector` of the non-zero elements of the matrix.
+* `i`: An `Rcpp::IntegerVector` of the same length as `x` specifying the column indices of the non-zero elements of the matrix.
+* `p`: An `Rcpp::IntegerVector` of pointers for each column to the initial index in `i` and `x` of elements in the column.
+* `Dim`: An `Rcpp::IntegerVector` of length 2 giving the number of rows and columns in the matrix.
+
+Any object of class `Matrix::dgCMatrix` can be automatically converted to an Rcpp object of class `RcppSparse::Matrix`. 
+
+However, to convert back to an R object, we use the `.wrap()` method and return an `Rcpp::S4` object.
+
+```{Rcpp, eval = FALSE}
+//[[Rcpp::export]]
+Rcpp::S4 convert(RcppSparse::Matrix& A){
+  return A.wrap();
+}
+```
+
+```{R}
+library(Matrix)
+A <- rsparsematrix(nrow = 10, ncol = 10, density = 0.1)
+B <- convert(A)
+all.equal(A, B)
+```
+
+It is not necessary to specify `const` when passing an `RcppSparse::Matrix` because it is read-only. Also, because base Rcpp types are pointers, it is unnecessary to pass by reference. 
+
+Because `RcppSparse::Matrix` is a zero-copy by-reference read-only version of the R object, it is not templated and types are always double (`x`) and integer (`i`, `p`, `x`).
+
+## Constructors
+
+* `Matrix(SEXP)` (usually handled by `Rcpp::as`)
+* `Matrix(Rcpp::S4)`
+* `Matrix()`
+* `Matrix(Rcpp::NumericVector x, Rcpp::IntegerVector i, Rcpp::IntegerVector p, Rcpp::IntegerVector Dim)`
+
+Most commonly, the matrix is seamlessly passed into an Rcpp function from R, and `RcppSparse` takes care of the conversion (with some help from `Rcpp`).
+
+However, `Matrix` may also be constructed from Rcpp vectors:
+
+```{Rcpp, eval = FALSE}
+//[[Rcpp::export]]
+Rcpp::S4 construct_from_vectors(){
+    Rcpp::NumericVector x = {0.41, 0.35, 0.84, 0.37, 0.26};
+    Rcpp::IntegerVector i = {0, 2, 0, 1, 1};
+    Rcpp::IntegerVector p = {0, 0, 1, 2, 4, 5};
+    Rcpp::IntegerVector Dim = {5, 5};
+    
+    // this constructor...
+    RcppSparse::Matrix m(x, i, p, Dim);
+    
+    // ... is equivalent to this:
+    RcppSparse::Matrix m2;
+    m2.x = x;
+    m2.i = i;
+    m2.p = p;
+    m2.Dim = Dim;
+    
+    return m2.wrap();
+}
+```
+
+```{R}
+construct_from_vectors()
+```
+
+Because each slot in a `Matrix` is a public member, they may also be directly modified with the caveat that R S4 object and/or iterators may be invalidated (very bad things can happen) if you do not really know what you are doing.
+
+## Member functions
+
+`RcppSparse::Matrix` objects contain the following member functions:
+
+* `.rows()`, `.nrow()`
+* `.cols()`, `.ncol()`
+* `.n_nonzero(): number of nonzeros in the matrix
+* `.nonzeros()`: return the `x` vector
+* `.innerIndexPtr()`: return the `i` vector
+* `.outerIndexPtr()`: return the `p` vector
+* `.crossprod()`
+* `.colSums()`, `.rowSums()`, `.colMeans()`, `.rowMeans()`
+* `.t()` (wraps `Matrix::t` method for `dgCMatrix`)
+* `.InnerIndices(int col)`: return `std::vector<unsigned int>` of rows with non-zero values in a column
+* `.emptyInnerIndices(int col)`: return `std::vector<unsigned int>` of rows with zero values in a column
+* `.isAppxSymmetric()`: checks approximately for symmetry by checking for square dimensions and then by comparing the first row/column
+
+## Dense element access
+
+`RcppSparse::Matrix` is read-only. However, the values of elements may be accessed using the parenthesis operator:
+
+* `double Matrix[int n]` return the n'th nonzero value
+* `double Matrix(int row, int col)`
+* `Rcpp::NumericVector Matrix(Rcpp::IntegerVector row, int col)`
+* `Rcpp::NumericVector Matrix(int row, Rcpp::IntegerVector col)`
+* `Rcpp::NumericMatrix Matrix(Rcpp::IntegerVector row, Rcpp::IntegerVector col)`
+
+There are no specializations for block lookup, thus, complicated lookups using the parenthesis operator can quickly become inefficient and iterators should be preferred.
+
+Marginal dense subsets are also supported, although these may be better accessed via sparse iterators:
+
+* `Rcpp::NumericVector Matrix.col(int i)`
+* `Rcpp::NumericMatrix Matrix.col(Rcpp::IntegerVector i)`
+* `Rcpp::NumericVector Matrix.row(int i)`
+* `Rcpp::NumericMatrix Matrix.row(Rcpp::IntegerVector i)`
+
+## Sparse Iterators
+
+The major focus of the `RcppSparse::Matrix` class is providing efficient const iterators for traversal over non-zero values. 
+
+* `::InnerIterator`: Non-zeros in a column
+* `::InnerRowIterator`: Non-zeros in a row (inefficient, prefer `InnerIterator`)
+* `::InnerIteratorInRange`: Non-zeros in a column at rows also in a provided index vector
+* `::InnerIteratorNotInRange`: Non-zeros in a column at rows that are not in a provided index vector
+
+Constructors:
+
+* `it(RcppSparse::Matrix, int)` constructor for `InnerIterator` and `InnerRowIterator`
+* `it(RcppSparse::Matrix, int, std::vector<unsigned int>)` constructor for `InnerIteratorInRange` and `InnerIteratorNotInRange`
+
+Operators:
+
+* `operator bool()` to check if the iterator is in the range
+* `++it`, pre-increment
+
+Member functions:
+
+* `it.value()`, const double reference to value
+* `it.row()`, const int giving row of current value
+* `it.col()`, const int giving column of current value
+
+### Column and Row Iterator
+
+This example uses a column iterator to calculate column sums:
+
+```{Rcpp, eval = FALSE}
+//[[Rcpp::export]]
+Rcpp::NumericVector column_sums(RcppSparse::Matrix& A) {
+    Rcpp::NumericVector sums(A.cols());
+    for (size_t col = 0; col < A.cols(); ++col)
+        for (RcppSparse::Matrix::InnerIterator it(A, col); it; ++it)
+            sums(col) += it.value();
+    return sums;
+}
+```
+
+```{R}
+A <- rsparsematrix(5, 5, 0.5)
+column_sums(A)
+```
+
+Usage of the row iterator is similar, but should not be used unless absolutely necessary as row-wise lookup in a column-major storage format is much less efficient than column-wise lookup.
+
+The `InnerIteratorInRange` iterator receives a `std::vector<unsigned int>` giving row indices in a range over which to iterate. This is similar to the Boost ForwardTraversalIterator concept. This iterator can be useful for comparing two sparse matrices, and can be more efficient than simply pairing two iterators. `InnerIteratorNotInRange` usage is similar, but looks up values not in the specified range.
+
+## Reference vs. Copy
+
+Like Rcpp objects, `RcppSparse::Matrix` is a reference to R objects. Any changes to object on the C++ side will affect the R object. If this is not desired, use `.clone()`:
+
+```{Rcpp, eval = FALSE}
+//[[Rcpp::export]]
+Rcpp::S4 change_value1(RcppSparse::Matrix A){
+    RcppSparse::Matrix B = A.clone();
+    B.x[0] = 999;
+    return B.wrap();
+}
+
+//[[Rcpp::export]]
+void change_value2(RcppSparse::Matrix A){
+    A.x[0] = 999;
+}
+```
+
+```{R}
+A <- rsparsematrix(3, 3, 0.5)
+A2 <- change_value1(A)
+A2@x[1]
+A@x[1]
+change_value2(A)
+A@x[1]
+```
+
+## Benchmarks
+
+The following are very rudimentary benchmarks that are intended to show that `RcppSparse::Matrix` is on par with `arma::sp_mat` and `Eigen::SparseMatrix`. Although evidence here is limited, further application has shown that performance is very much on par both libraries, and consistently exceeds that of the `Matrix` R package in equivalent operations.
+
+### Constructor Latency
+
+Here we measure the latency of constructing a 1% dense 10000 x 10000 sparse dgCMatrix in `RcppSparse::Matrix`, `arma::sp_mat`, and `Eigen::SparseMatrix<double>`:
+
+```{Rcpp, eval = FALSE, echo = FALSE, warning = FALSE, message = FALSE}
+//[[Rcpp::export]]
+Rcpp::S4 RcppSparse_as_wrap(RcppSparse::Matrix A){
+  return A.wrap();
+}
+
+//[[Rcpp::export]]
+arma::sp_mat arma_as_wrap(arma::sp_mat& A){
+  return A;
+}
+
+//[[Rcpp::export]]
+Eigen::SparseMatrix<double> Eigen_as_wrap(Eigen::SparseMatrix<double> & A){
+  return A;
+}
+```
+
+```{R, echo = FALSE, fig.width = 4, fig.height = 2, warning = FALSE, message = FALSE}
+library(microbenchmark)
+A <- rsparsematrix(10000, 10000, 0.01)
+mb <- microbenchmark(
+ "RcppSparse" = RcppSparse_as_wrap(A),
+ "Armadillo" = arma_as_wrap(A),
+ "Eigen" = Eigen_as_wrap(A))
+p1 <- autoplot(mb)
+p1 + theme_classic()
+```
+
+This benchmark shows how important direct access to R objects in memory can be when performance and memory usage is a major concern.
+
+### Iterator Performance
+
+Here we compare the performance of `RcppSparse::Matrix` column iterator to corresponding counterparts in RcppEigen and RcppArmadillo. We use the RcppClock R package for benchmarking the Rcpp code itself to avoid the effects of latency during the Rcpp wrap and as routines. 10 outer and inner replicates are run:
+
+```{Rcpp, eval = FALSE, echo = FALSE}
+//[[Rcpp::export]]
+void bench(Eigen::SparseMatrix<double> A1, arma::sp_mat& A2, RcppSparse::Matrix& A3){
+    std::vector<double> sums1(A1.cols()), sums2(A1.cols()), sums3(A1.cols());
+    Rcpp::Clock clock;
+    
+    for(int rep = 0; rep < 10; ++rep){
+        clock.tick("Eigen");
+        for(int rep2 = 0; rep2 < 10; ++rep2)
+            for(size_t i = 0; i < A1.cols(); ++i)
+                for(Eigen::SparseMatrix<double>::InnerIterator it(A1, i); it; ++it)
+                    sums1[i] += it.value();
+        clock.tock("Eigen");
+        
+        clock.tick("Armadillo");
+        for(int rep2 = 0; rep2 < 10; ++rep2)
+            for(int i = 0; i < A1.cols(); ++i)
+                for(arma::sp_mat::const_col_iterator it = A2.begin_col(i); it != A2.end_col(i); ++it)
+                    sums2[i] += *it;
+        clock.tock("Armadillo");
+        
+        clock.tick("RcppSparse");
+        for(int rep2 = 0; rep2 < 10; ++rep2)
+            for(size_t i = 0; i < A1.cols(); ++i)
+                for(RcppSparse::Matrix::InnerIterator it(A3, i); it; ++it)
+                    sums3[i] += it.value();
+        clock.tock("RcppSparse");
+    }
+    clock.stop("times");        
+}
+```
+
+```{R, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 2, fig.width = 4}
+A <- rsparsematrix(100000, 1000, 0.1)
+bench(A, A, A)
+times <- data.frame(times$ticker, times$timer)
+times$times.timer <- times$times.timer / 1e6
+ggplot(times, aes(y = times.ticker, x = times.timer)) + geom_violin() + geom_jitter(size = 1, height = 0.1) +
+  scale_x_continuous(limits = c(0, 300)) + labs(y = "", x = "milliseconds") + theme_classic()
+```
