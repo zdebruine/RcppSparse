@@ -1,8 +1,8 @@
 # RcppSparse
 
 Quick links:
-- (Documentation)[https://zdebruine.github.io/RcppSparse/articles/Documentation.html]
-- (Example)[https://github.com/zdebruine/RcppSparse/blob/main/src/example.cpp]
+- [Documentation](https://zdebruine.github.io/RcppSparse/articles/Documentation.html)
+- [Example](https://github.com/zdebruine/RcppSparse/blob/main/src/example.cpp)
 - Install: `install.packages("RcppSparse")
 
 RcppSparse provides a seamless Rcpp object class for R sparse matrix objects. The `RcppSparse::Matrix` class can directly import `Matrix::dgCMatrix-class` objects from R without any copying by simply using base Rcpp types (`IntegerVector` and `NumericVector`).
