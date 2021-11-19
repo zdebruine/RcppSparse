@@ -1,11 +1,11 @@
-Package: RcppSparse
+Package: tabMatrix
 Type: Package
-Title: An 'Rcpp' sparse matrix class header
+Title: Tabulated compressed sparse column matrix
 Version: 1.0
-Date: 2021-11-04
+Date: 2021-11-25
 Author: Zach DeBruine
 Maintainer: Zach DeBruine <zacharydebruine@gmail.com>
-Description: A lightweight 'Rcpp' sparse 'dgCMatrix' matrix class for seamless access to R objects in memory.
+Description: A tabulated CSC sparse matrix and vector format for low-memory storage of discrete sparse data
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.7), Matrix
 LinkingTo: Rcpp
@@ -13,9 +13,4 @@ RoxygenNote: 7.1.2
 Suggests: 
     rmarkdown,
     knitr,
-    RcppArmadillo,
-    RcppEigen,
-    RcppClock,
-    ggplot2,
-    microbenchmark
 VignetteBuilder: knitr

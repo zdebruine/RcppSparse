@@ -1,4 +1,4 @@
-useDynLib(RcppSparse, .registration=TRUE)
+useDynLib(tabMatrix, .registration=TRUE)
 import(Rcpp)
 import(Matrix)
 export(columnSums)
