@@ -1,0 +1,4 @@
+useDynLib(RcppSparse, .registration=TRUE)
+import(Rcpp)
+import(Matrix)
+export(columnSums)

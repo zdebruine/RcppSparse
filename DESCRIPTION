@@ -1,0 +1,16 @@
+Package: RcppSparse
+Type: Package
+Title: Rcpp dgCMatrix class
+Version: 1.0
+Date: 2021-11-25
+Author: Zach DeBruine
+Maintainer: Zach DeBruine <zacharydebruine@gmail.com>
+Description: Efficient zero-copy by-reference access to R dgCMatrix objects in memory via Rcpp base classes
+License: GPL (>= 2)
+Imports: Rcpp (>= 1.0.7), Matrix
+LinkingTo: Rcpp
+RoxygenNote: 7.1.2
+Suggests: 
+    rmarkdown,
+    knitr,
+VignetteBuilder: knitr
