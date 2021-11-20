@@ -1,4 +1,4 @@
-Package: tabMatrix
+Package: RcppSparse
 Type: Package
 Title: Tabulated compressed sparse column matrix
 Version: 1.0
