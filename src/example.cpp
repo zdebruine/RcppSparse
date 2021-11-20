@@ -1,6 +1,6 @@
-#include "../inst/include/tabMatrix.h"
+#include "../inst/include/RcppSparse.h"
 
-//' Simple tabMatrix::cscMatrix example
+//' Simple RcppSparse::Matrix example
 //'
 //' Compute column sums of a sparse matrix
 //'
@@ -13,20 +13,20 @@
 //' # Relevant C++ code:
 //' \dontrun{
 //' ```{Rcpp}
-//' Rcpp::NumericVector columnSums(tabMatrix::cscMatrix& A) {
+//' Rcpp::NumericVector columnSums(RcppSparse::Matrix& A) {
 //'      Rcpp::NumericVector sums(A.cols());
 //'      for (size_t col = 0; col < A.cols(); ++col)
-//'           for (tabMatrix::cscMatrix::InnerIterator it(A, col); it; ++it)
+//'           for (RcppSparse::Matrix::InnerIterator it(A, col); it; ++it)
 //'                sums(col) += it.value();
 //'      return sums;
 //' }
 //' ```
 //' }
 //[[Rcpp::export]]
-Rcpp::NumericVector columnSums(tabMatrix::cscMatrix& A) {
+Rcpp::NumericVector columnSums(RcppSparse::Matrix& A) {
     Rcpp::NumericVector sums(A.cols());
     for (size_t col = 0; col < A.cols(); ++col)
-        for (tabMatrix::cscMatrix::InnerIterator it(A, col); it; ++it)
+        for (RcppSparse::Matrix::InnerIterator it(A, col); it; ++it)
             sums(col) += it.value();
     return sums;
 }
